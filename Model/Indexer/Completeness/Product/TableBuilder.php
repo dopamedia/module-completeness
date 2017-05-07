@@ -29,11 +29,6 @@ class TableBuilder
     protected $metadataPool;
 
     /**
-     * @var bool
-     */
-    protected $isExecuted = false;
-
-    /**
      * TableBuilder constructor.
      * @param \Dopamedia\Completeness\Helper\Indexer $indexerHelper
      * @param \Magento\Framework\App\ResourceConnection $resource
@@ -55,15 +50,11 @@ class TableBuilder
      * @param array $changedIds
      * @return void
      */
-    public function build(int $storeId, array $changedIds = [])
+    public function build(int $storeId, array $changedIds = null)
     {
-        if ($this->isExecuted) {
-            return;
-        }
-
         $attributes = $this->indexerHelper->clearAttributesBuffer()->getAttributes($storeId);
-        $this->createTemporaryTable($storeId, $attributes);
-        $this->fillTemporaryTable($storeId, $attributes);
+        $this->createTemporaryTable($storeId);
+        $this->fillTemporaryTable($storeId, $attributes, $changedIds);
     }
 
     /**
@@ -77,10 +68,9 @@ class TableBuilder
 
     /**
      * @param int $storeId
-     * @param \Magento\Eav\Model\Entity\Attribute[] $attributes
      * @return void
      */
-    private function createTemporaryTable(int $storeId, array $attributes)
+    private function createTemporaryTable(int $storeId)
     {
         $temporaryName = $this->getTemporaryTableName($storeId);
         $temporaryTable = $this->connection->newTable($temporaryName);
@@ -101,10 +91,11 @@ class TableBuilder
 
     /**
      * @param int $storeId
-     * @param \Magento\Eav\Model\Entity\Attribute[] $attributes
+     * @param array $attributes
+     * @param array|null $changedIds
      * @return void
      */
-    private function fillTemporaryTable(int $storeId, array $attributes)
+    private function fillTemporaryTable(int $storeId, array $attributes, array $changedIds = null)
     {
         $select = $this->connection->select();
         $productMetadata = $this->metadataPool->getMetadata(\Magento\Catalog\Api\Data\ProductInterface::class);
@@ -115,6 +106,13 @@ class TableBuilder
                 ['e' => $this->resource->getTableName('catalog_product_entity')],
                 [$productMetadata->getLinkField()]
             );
+
+            if ($changedIds !== null) {
+                $select->where(
+                    sprintf('e.%s IN (?)', $productMetadata->getLinkField()),
+                    $changedIds
+                );
+            }
 
             $select->columns(['attribute_id' => new \Zend_Db_Expr($attribute->getId())]);
 

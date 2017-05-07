@@ -70,11 +70,11 @@ abstract class AbstractAction
 
     /**
      * @param int $storeId
-     * @param array $changedIds
+     * @param array|null $changedIds
      * @throws \Magento\Framework\Exception\LocalizedException
      * @return void
      */
-    protected function reindexByStore(int $storeId, array $changedIds = [])
+    protected function reindexByStore(int $storeId, array $changedIds = null)
     {
         try {
             $this->tableBuilder->build($storeId, $changedIds);
@@ -88,19 +88,15 @@ abstract class AbstractAction
      * TODO::replace raw query with DDL
      *
      * @param int $storeId
-     * @param array $changedIds
+     * @param array|null $changedIds
      */
-    private function updateCompleteness(int $storeId, array $changedIds = [])
+    private function updateCompleteness(int $storeId, array $changedIds = null)
     {
-        $bind = [
-            'storeId' => $storeId
-        ];
-
         $rawQuery = <<<SQL
 INSERT INTO catalog_product_completeness
   SELECT
     entity_id,
-    :storeId                                   AS store_id,
+    %store_id%                                 AS store_id,
     (required_count - req_values_filled)       AS missing_count,
     required_count,
     (req_values_filled / required_count * 100) AS ratio
@@ -113,7 +109,7 @@ INSERT INTO catalog_product_completeness
              FROM catalog_product_completeness_requirement AS cpcr
              WHERE cpcr.type_id = values_filled.type_id
                    AND cpcr.attribute_set_id = values_filled.attribute_set_id
-                   AND cpcr.store_id = :storeId
+                   AND cpcr.store_id = %store_id%
            ) AS required_count
          FROM (
                 SELECT
@@ -122,18 +118,19 @@ INSERT INTO catalog_product_completeness
                   cpe.attribute_set_id,
                   (
                     SELECT SUM(filled) AS filled
-                    FROM %s AS cpcti
+                    FROM %temporary_table_name% AS cpcti
                     WHERE cpcti.entity_id = cpe.entity_id
                           AND cpcti.attribute_id IN (
                       SELECT attribute_id
                       FROM catalog_product_completeness_requirement AS cpcr
                       WHERE cpcr.type_id = cpe.type_id
                             AND cpcr.attribute_set_id = cpe.attribute_set_id
-                            AND cpcr.store_id = :storeId
+                            AND cpcr.store_id = %store_id%
                     )
                     GROUP BY cpe.entity_id
                   ) AS req_values_filled
                 FROM catalog_product_entity AS cpe
+                %entity_id_limitation%
                 GROUP BY cpe.entity_id
               ) AS values_filled
        ) AS result
@@ -143,7 +140,18 @@ ON DUPLICATE KEY UPDATE
   ratio          = VALUES(ratio);
 SQL;
 
-        $query = $this->connection->query(sprintf($rawQuery, $this->tableBuilder->getTemporaryTableName($storeId)), $bind);
+        $entityIdLimitation = ($changedIds === null)
+            ? ''
+            : sprintf('WHERE cpe.entity_id IN (%s)', implode(',', $changedIds));
+
+        $rawQuery = strtr($rawQuery, [
+            '%temporary_table_name%' => $this->tableBuilder->getTemporaryTableName($storeId),
+            '%store_id%' => $storeId,
+            '%entity_id_limitation%' => $entityIdLimitation
+        ]);
+
+
+        $query = $this->connection->query($rawQuery);
         $query->execute();
     }
 }

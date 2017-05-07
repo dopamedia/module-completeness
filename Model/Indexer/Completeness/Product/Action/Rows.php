@@ -14,11 +14,11 @@ class Rows extends AbstractAction
      * @TODO::currently a full reindex gets performed on every save operation => implement logic to process only some entities
      * @inheritDoc
      */
-    public function execute(array $entityIds = [], $useTempTable = false): AbstractAction
+    public function execute(array $entityIds = []): AbstractAction
     {
         try {
             foreach ($this->storeManager->getStores(true) as $store) {
-                $this->reindexByStore($store->getId());
+                $this->reindexByStore($store->getId(), $entityIds);
             }
         } catch (\Exception $e) {
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()), $e);
