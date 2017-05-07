@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Catalog\Model\ResourceModel\Product">
-        <plugin name="productCompleteness" type="Dopamedia\ProductCompleteness\Plugin\Product" />
+        <plugin name="completeness" type="Dopamedia\Completeness\Plugin\Product" />
     </type>
     <type name="Magento\Catalog\Model\Product\Action">
-        <plugin name="productCompleteness" type="Dopamedia\ProductCompleteness\Plugin\Product\Action" />
+        <plugin name="completeness" type="Dopamedia\Completeness\Plugin\Product\Action" />
     </type>
     <!--
     <type name="Magento\Store\Model\ResourceModel\Store">

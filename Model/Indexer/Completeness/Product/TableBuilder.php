@@ -4,12 +4,12 @@
  * Date: 05.05.17
  */
 
-namespace Dopamedia\ProductCompleteness\Model\Indexer\Completeness;
+namespace Dopamedia\Completeness\Model\Indexer\Completeness\Product;
 
 class TableBuilder
 {
     /**
-     * @var \Dopamedia\ProductCompleteness\Helper\Indexer
+     * @var \Dopamedia\Completeness\Helper\Indexer
      */
     private $indexerHelper;
 
@@ -35,12 +35,12 @@ class TableBuilder
 
     /**
      * TableBuilder constructor.
-     * @param \Dopamedia\ProductCompleteness\Helper\Indexer $indexerHelper
+     * @param \Dopamedia\Completeness\Helper\Indexer $indexerHelper
      * @param \Magento\Framework\App\ResourceConnection $resource
      * @param \Magento\Framework\EntityManager\MetadataPool $metadataPool
      */
     public function __construct(
-        \Dopamedia\ProductCompleteness\Helper\Indexer $indexerHelper,
+        \Dopamedia\Completeness\Helper\Indexer $indexerHelper,
         \Magento\Framework\App\ResourceConnection $resource,
         \Magento\Framework\EntityManager\MetadataPool $metadataPool
     ) {

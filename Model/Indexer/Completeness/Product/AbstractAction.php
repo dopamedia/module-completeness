@@ -4,7 +4,7 @@
  * Date: 23.04.17
  */
 
-namespace Dopamedia\ProductCompleteness\Model\Indexer\Completeness;
+namespace Dopamedia\Completeness\Model\Indexer\Completeness\Product;
 
 use Magento\Framework\App\ResourceConnection;
 
@@ -26,7 +26,7 @@ abstract class AbstractAction
     protected $storeManager;
 
     /**
-     * @var \Dopamedia\ProductCompleteness\Helper\Indexer
+     * @var \Dopamedia\Completeness\Helper\Indexer
      */
     protected $indexerHelper;
 
@@ -42,13 +42,17 @@ abstract class AbstractAction
 
     /**
      * AbstractAction constructor.
+     * @param ResourceConnection $resource
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Dopamedia\Completeness\Helper\Indexer $indexerHelper
+     * @param TableBuilder $tableBuilder
+     * @param \Magento\Framework\EntityManager\MetadataPool $metadataPool
      */
     public function __construct(
         ResourceConnection $resource,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Dopamedia\ProductCompleteness\Helper\Indexer $indexerHelper,
-        \Dopamedia\ProductCompleteness\Model\Indexer\Completeness\TableBuilder $tableBuilder,
+        \Dopamedia\Completeness\Helper\Indexer $indexerHelper,
+        \Dopamedia\Completeness\Model\Indexer\Completeness\Product\TableBuilder $tableBuilder,
         \Magento\Framework\EntityManager\MetadataPool $metadataPool
     ) {
         $this->resource = $resource;

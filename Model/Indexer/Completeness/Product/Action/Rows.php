@@ -4,18 +4,17 @@
  * Date: 23.04.17
  */
 
-namespace Dopamedia\ProductCompleteness\Model\Indexer\Completeness\Action;
+namespace Dopamedia\Completeness\Model\Indexer\Completeness\Product\Action;
 
-use Dopamedia\ProductCompleteness\Model\Indexer\Completeness\AbstractAction;
+use Dopamedia\Completeness\Model\Indexer\Completeness\Product\AbstractAction;
 
-class Full extends AbstractAction
+class Rows extends AbstractAction
 {
     /**
-     * @param array|null $ids
-     * @return AbstractAction
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @TODO::currently a full reindex gets performed on every save operation => implement logic to process only some entities
+     * @inheritDoc
      */
-    public function execute(array $ids = null): AbstractAction
+    public function execute(array $entityIds = [], $useTempTable = false): AbstractAction
     {
         try {
             foreach ($this->storeManager->getStores(true) as $store) {
@@ -26,4 +25,5 @@ class Full extends AbstractAction
         }
         return $this;
     }
+
 }

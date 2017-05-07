@@ -4,7 +4,7 @@
  * Date: 23.04.17
  */
 
-namespace Dopamedia\ProductCompleteness\Setup;
+namespace Dopamedia\Completeness\Setup;
 
 use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
@@ -12,7 +12,7 @@ use Magento\Framework\Setup\SchemaSetupInterface;
 
 /**
  * Class InstallSchema
- * @package Dopamedia\ProductCompleteness\Setup
+ * @package Dopamedia\Completeness\Setup
  */
 class InstallSchema implements InstallSchemaInterface
 {

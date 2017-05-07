@@ -4,13 +4,13 @@
  * Date: 23.04.17
  */
 
-namespace Dopamedia\ProductCompleteness\Plugin\Product;
+namespace Dopamedia\Completeness\Plugin\Product;
 
-use Dopamedia\ProductCompleteness\Plugin\AbstractPlugin;
+use Dopamedia\Completeness\Plugin\AbstractPlugin;
 
 /**
  * Class Action
- * @package Dopamedia\ProductCompleteness\Plugin\Product
+ * @package Dopamedia\Completeness\Plugin\Product
  */
 class Action extends AbstractPlugin
 {

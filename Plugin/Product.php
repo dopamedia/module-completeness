@@ -4,14 +4,14 @@
  * Date: 23.04.17
  */
 
-namespace Dopamedia\ProductCompleteness\Plugin;
+namespace Dopamedia\Completeness\Plugin;
 
 use Magento\Catalog\Model\ResourceModel\Product as ResourceProduct;
 use Magento\Framework\Model\AbstractModel;
 
 /**
  * Class Product
- * @package Dopamedia\ProductCompleteness\Plugin
+ * @package Dopamedia\Completeness\Plugin
  */
 class Product extends AbstractPlugin
 {

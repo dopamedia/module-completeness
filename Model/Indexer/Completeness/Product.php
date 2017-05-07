@@ -4,10 +4,9 @@
  * Date: 23.04.17
  */
 
-namespace Dopamedia\ProductCompleteness\Model\Indexer;
+namespace Dopamedia\Completeness\Model\Indexer\Completeness;
 
-
-class Completeness implements \Magento\Framework\Indexer\ActionInterface, \Magento\Framework\Mview\ActionInterface
+class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Framework\Mview\ActionInterface
 {
     /**
      * Indexer ID in configuration
@@ -15,12 +14,12 @@ class Completeness implements \Magento\Framework\Indexer\ActionInterface, \Magen
     const INDEXER_ID = 'catalog_product_completeness';
 
     /**
-     * @var Completeness\Action\FullFactory
+     * @var Product\Action\FullFactory
      */
     protected $fullActionFactory;
 
     /**
-     * @var Completeness\Action\RowsFactory
+     * @var Product\Action\RowsFactory
      */
     protected $rowsActionFactory;
 
@@ -30,13 +29,14 @@ class Completeness implements \Magento\Framework\Indexer\ActionInterface, \Magen
     protected $indexerRegistry;
 
     /**
-     * Completeness constructor.
-     * @param Completeness\Action\FullFactory $fullActionFactory
+     * Product constructor.
+     * @param Product\Action\FullFactory $fullActionFactory
+     * @param Product\Action\RowsFactory $rowsActionFactory
      * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
      */
     public function __construct(
-        \Dopamedia\ProductCompleteness\Model\Indexer\Completeness\Action\FullFactory $fullActionFactory,
-        \Dopamedia\ProductCompleteness\Model\Indexer\Completeness\Action\RowsFactory $rowsActionFactory,
+        \Dopamedia\Completeness\Model\Indexer\Completeness\Product\Action\FullFactory $fullActionFactory,
+        \Dopamedia\Completeness\Model\Indexer\Completeness\Product\Action\RowsFactory $rowsActionFactory,
         \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
     ) {
         $this->fullActionFactory = $fullActionFactory;
@@ -79,14 +79,14 @@ class Completeness implements \Magento\Framework\Indexer\ActionInterface, \Magen
 
     /**
      * @param int[] $ids
-     * @return Completeness
+     * @return Product
      */
-    protected function executeAction(array $ids): Completeness
+    protected function executeAction(array $ids): Product
     {
         $ids = array_unique($ids);
         $indexer = $this->indexerRegistry->get(static::INDEXER_ID);
 
-        /** @var Completeness\Action\Rows $action */
+        /** @var Product\Action\Rows $action */
         $action = $this->rowsActionFactory->create();
         if ($indexer->isWorking()) {
             $action->execute($ids, true);

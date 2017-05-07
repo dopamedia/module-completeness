@@ -4,10 +4,9 @@
  * Date: 23.04.17
  */
 
-namespace Dopamedia\ProductCompleteness\Plugin;
+namespace Dopamedia\Completeness\Plugin;
 
-
-use Dopamedia\ProductCompleteness\Model\Indexer\Completeness;
+use Dopamedia\Completeness\Model\Indexer\Completeness\Product;
 
 class AbstractPlugin
 {
@@ -31,7 +30,7 @@ class AbstractPlugin
      */
     protected function reindexRow(int $productId)
     {
-        $indexer = $this->indexerRegistry->get(Completeness::INDEXER_ID);
+        $indexer = $this->indexerRegistry->get(Product::INDEXER_ID);
         if (!$indexer->isScheduled()) {
             $indexer->reindexRow($productId);
         }
@@ -43,10 +42,9 @@ class AbstractPlugin
      */
     protected function reindexList(array $productIds)
     {
-        $indexer = $this->indexerRegistry->get(Completeness::INDEXER_ID);
+        $indexer = $this->indexerRegistry->get(Product::INDEXER_ID);
         if (!$indexer->isScheduled()) {
             $indexer->reindexList($productIds);
         }
     }
-
 }

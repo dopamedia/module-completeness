@@ -3,7 +3,7 @@
     <type name="Magento\Catalog\Ui\DataProvider\Product\ProductDataProvider">
         <arguments>
             <argument name="addFieldStrategies" xsi:type="array">
-                <item name="completeness" xsi:type="object">Dopamedia\ProductCompleteness\Ui\DataProvider\Product\AddCompletenessFieldToCollection</item>
+                <item name="completeness" xsi:type="object">Dopamedia\Completeness\Ui\DataProvider\Product\AddCompletenessFieldToCollection</item>
             </argument>
         </arguments>
     </type>

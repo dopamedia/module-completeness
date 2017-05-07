@@ -4,7 +4,7 @@
  * Date: 23.04.17
  */
 
-namespace Dopamedia\ProductCompleteness\Ui\DataProvider\Product;
+namespace Dopamedia\Completeness\Ui\DataProvider\Product;
 
 use Magento\Framework\Data\Collection;
 use Magento\Ui\DataProvider\AddFieldToCollectionInterface;

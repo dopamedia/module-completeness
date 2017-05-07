@@ -4,7 +4,7 @@
  * Date: 23.04.17
  */
 
-namespace Dopamedia\ProductCompleteness\Helper;
+namespace Dopamedia\Completeness\Helper;
 
 class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
 {
