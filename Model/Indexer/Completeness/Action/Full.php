@@ -18,7 +18,7 @@ class Full extends AbstractAction
     public function execute(array $ids = null): AbstractAction
     {
         try {
-            foreach ($this->storeManager->getStores() as $store) {
+            foreach ($this->storeManager->getStores(true) as $store) {
                 $this->reindexByStore($store->getId());
             }
         } catch (\Exception $e) {

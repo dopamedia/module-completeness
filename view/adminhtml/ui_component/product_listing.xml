@@ -4,8 +4,8 @@
         <column name="completeness" class="Dopamedia\ProductCompleteness\Ui\Component\Listing\Columns\Completeness">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">textRange</item>
                     <item name="add_field" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Completeness</item>
                     <item name="sortOrder" xsi:type="number">75</item>
                 </item>

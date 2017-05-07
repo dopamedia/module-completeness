@@ -17,7 +17,7 @@ class Rows extends AbstractAction
     public function execute(array $entityIds = [], $useTempTable = false): AbstractAction
     {
         try {
-            foreach ($this->storeManager->getStores() as $store) {
+            foreach ($this->storeManager->getStores(true) as $store) {
                 $this->reindexByStore($store->getId());
             }
         } catch (\Exception $e) {
