@@ -26,9 +26,9 @@ abstract class AbstractAction
     protected $storeManager;
 
     /**
-     * @var \Dopamedia\Completeness\Helper\Indexer
+     * @var \Dopamedia\Completeness\Helper\IndexerFactory
      */
-    protected $indexerHelper;
+    protected $indexerHelperFactory;
 
     /**
      * @var \Magento\Framework\EntityManager\MetadataPool
@@ -39,19 +39,19 @@ abstract class AbstractAction
      * AbstractAction constructor.
      * @param ResourceConnection $resource
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Dopamedia\Completeness\Helper\Indexer $indexerHelper
+     * @param \Dopamedia\Completeness\Helper\IndexerFactory $indexerHelperFactory
      * @param \Magento\Framework\EntityManager\MetadataPool $metadataPool
      */
     public function __construct(
         ResourceConnection $resource,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Dopamedia\Completeness\Helper\Indexer $indexerHelper,
+        \Dopamedia\Completeness\Helper\IndexerFactory $indexerHelperFactory,
         \Magento\Framework\EntityManager\MetadataPool $metadataPool
     ) {
         $this->resource = $resource;
         $this->connection = $resource->getConnection();
         $this->storeManager = $storeManager;
-        $this->indexerHelper = $indexerHelper;
+        $this->indexerHelperFactory = $indexerHelperFactory;
         $this->metadataPool = $metadataPool;
     }
 
@@ -92,7 +92,7 @@ abstract class AbstractAction
      */
     private function buildTemporaryTable(int $storeId, array $changedIds = null)
     {
-        $attributes = $this->indexerHelper->clearAttributesBuffer()->getAttributes($storeId);
+        $attributes = $this->indexerHelperFactory->create()->getAttributes($storeId);
         $this->createTemporaryTable($storeId);
         $this->fillTemporaryTable($storeId, $attributes, $changedIds);
     }

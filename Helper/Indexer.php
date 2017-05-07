@@ -27,8 +27,13 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
      * @var null|array
      */
     private $attributeCodesBuffer;
-
-
+    
+    /**
+     * Indexer constructor.
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Framework\App\ResourceConnection $resource
+     * @param \Magento\Eav\Model\Config $eavConfig
+     */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\App\ResourceConnection $resource,
@@ -38,17 +43,6 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
         $this->eavConfig = $eavConfig;
         parent::__construct($context);
     }
-
-    /**
-     * @return Indexer
-     */
-    public function clearAttributesBuffer(): Indexer
-    {
-        $this->attributesBuffer = null;
-        $this->attributeCodesBuffer = null;
-        return $this;
-    }
-
 
     /**
      * @param string $name
