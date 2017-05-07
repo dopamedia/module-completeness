@@ -19,6 +19,11 @@ class TableBuilder
     private $resource;
 
     /**
+     * @var \Magento\Framework\DB\Adapter\AdapterInterface
+     */
+    private $connection;
+
+    /**
      * @var \Magento\Framework\EntityManager\MetadataPool
      */
     protected $metadataPool;
@@ -38,10 +43,10 @@ class TableBuilder
         \Dopamedia\ProductCompleteness\Helper\Indexer $indexerHelper,
         \Magento\Framework\App\ResourceConnection $resource,
         \Magento\Framework\EntityManager\MetadataPool $metadataPool
-    )
-    {
+    ) {
         $this->indexerHelper = $indexerHelper;
         $this->resource = $resource;
+        $this->connection = $resource->getConnection();
         $this->metadataPool = $metadataPool;
     }
 
@@ -77,17 +82,21 @@ class TableBuilder
      */
     private function createTemporaryTable(int $storeId, array $attributes)
     {
-        $tableName = $this->getTemporaryTableName($storeId);
+        $temporaryName = $this->getTemporaryTableName($storeId);
+        $temporaryTable = $this->connection->newTable($temporaryName);
 
-        $connection = $this->resource->getConnection();
+        $temporaryTable
+            ->addColumn('entity_id', \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER)
+            ->addColumn('attribute_id', \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER)
+            ->addColumn('filled', \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN)
+            ->addIndex(
+                'idx_primary',
+                    ['entity_id', 'attribute_id'],
+                    ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_PRIMARY]
+            );
 
-        // TODO::replace with newTemporaryTable, dropTemporaryTable and createTemporaryTable
-        $table = $connection->newTable($tableName);
-        $table->addColumn('entity_id', \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER);
-        $table->addColumn('attribute_id', \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER);
-        $table->addColumn('filled', \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN);
-        $connection->dropTable($tableName);
-        $connection->createTable($table);
+        $this->connection->dropTemporaryTable($temporaryName);
+        $this->connection->createTemporaryTable($temporaryTable);
     }
 
     /**
@@ -97,8 +106,7 @@ class TableBuilder
      */
     private function fillTemporaryTable(int $storeId, array $attributes)
     {
-        $connection = $this->resource->getConnection();
-        $select = $connection->select();
+        $select = $this->connection->select();
         $productMetadata = $this->metadataPool->getMetadata(\Magento\Catalog\Api\Data\ProductInterface::class);
 
         // TODO::find better way to save data to tmp table (maybe this could be done with a single query)
@@ -125,7 +133,7 @@ class TableBuilder
             );
 
             $sql = $select->insertFromSelect($this->getTemporaryTableName($storeId));
-            $connection->query($sql);
+            $this->connection->query($sql);
         }
     }
 }
