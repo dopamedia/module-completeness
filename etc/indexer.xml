@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Indexer/etc/indexer.xsd">
+    <indexer id="catalog_product_completeness" view_id="catalog_product_completeness" class="Dopamedia\ProductCompleteness\Model\Indexer\Completeness">
+        <title translate="true">Product Completeness</title>
+        <description translate="true">Index product completeness</description>
+    </indexer>
+</config>
