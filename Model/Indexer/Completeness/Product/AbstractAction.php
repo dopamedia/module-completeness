@@ -31,11 +31,6 @@ abstract class AbstractAction
     protected $indexerHelper;
 
     /**
-     * @var TableBuilder
-     */
-    private $tableBuilder;
-
-    /**
      * @var \Magento\Framework\EntityManager\MetadataPool
      */
     protected $metadataPool;
@@ -45,21 +40,18 @@ abstract class AbstractAction
      * @param ResourceConnection $resource
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Dopamedia\Completeness\Helper\Indexer $indexerHelper
-     * @param TableBuilder $tableBuilder
      * @param \Magento\Framework\EntityManager\MetadataPool $metadataPool
      */
     public function __construct(
         ResourceConnection $resource,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Dopamedia\Completeness\Helper\Indexer $indexerHelper,
-        \Dopamedia\Completeness\Model\Indexer\Completeness\Product\TableBuilder $tableBuilder,
         \Magento\Framework\EntityManager\MetadataPool $metadataPool
     ) {
         $this->resource = $resource;
         $this->connection = $resource->getConnection();
         $this->storeManager = $storeManager;
         $this->indexerHelper = $indexerHelper;
-        $this->tableBuilder = $tableBuilder;
         $this->metadataPool = $metadataPool;
     }
 
@@ -77,10 +69,100 @@ abstract class AbstractAction
     protected function reindexByStore(int $storeId, array $changedIds = null)
     {
         try {
-            $this->tableBuilder->build($storeId, $changedIds);
+            $this->buildTemporaryTable($storeId, $changedIds);
             $this->updateCompleteness($storeId, $changedIds);
         } catch (\Exception $e) {
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()), $e);
+        }
+    }
+
+    /**
+     * @param int $storeId
+     * @return string
+     */
+    private function getTemporaryTableName(int $storeId): string
+    {
+        return sprintf('catalog_product_completeness_tmp_indexer_%s', $storeId);
+    }
+
+    /**
+     * @param int $storeId
+     * @param array|null $changedIds
+     * @return void
+     */
+    private function buildTemporaryTable(int $storeId, array $changedIds = null)
+    {
+        $attributes = $this->indexerHelper->clearAttributesBuffer()->getAttributes($storeId);
+        $this->createTemporaryTable($storeId);
+        $this->fillTemporaryTable($storeId, $attributes, $changedIds);
+    }
+
+    /**
+     * @param int $storeId
+     * @return void
+     */
+    private function createTemporaryTable(int $storeId)
+    {
+        $temporaryName = $this->getTemporaryTableName($storeId);
+        $temporaryTable = $this->connection->newTable($temporaryName);
+
+        $temporaryTable
+            ->addColumn('entity_id', \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER)
+            ->addColumn('attribute_id', \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER)
+            ->addColumn('filled', \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN)
+            ->addIndex(
+                'idx_primary',
+                ['entity_id', 'attribute_id'],
+                ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_PRIMARY]
+            );
+
+        $this->connection->dropTemporaryTable($temporaryName);
+        $this->connection->createTemporaryTable($temporaryTable);
+    }
+
+    /**
+     * @param int $storeId
+     * @param array $attributes
+     * @param array|null $changedIds
+     * @return void
+     */
+    private function fillTemporaryTable(int $storeId, array $attributes, array $changedIds = null)
+    {
+        $select = $this->connection->select();
+        $productMetadata = $this->metadataPool->getMetadata(\Magento\Catalog\Api\Data\ProductInterface::class);
+
+        // TODO::find better way to save data to tmp table (maybe this could be done with a single query)
+        foreach ($attributes as $attribute) {
+            $select->reset()->from(
+                ['e' => $this->resource->getTableName('catalog_product_entity')],
+                [$productMetadata->getLinkField()]
+            );
+
+            if ($changedIds !== null) {
+                $select->where(
+                    sprintf('e.%s IN (?)', $productMetadata->getLinkField()),
+                    $changedIds
+                );
+            }
+
+            $select->columns(['attribute_id' => new \Zend_Db_Expr($attribute->getId())]);
+
+            $joinCondition = sprintf(
+                'e.%3$s = %1$s.%3$s AND %1$s.attribute_id = %2$d AND %1$s.store_id = %4$d',
+                'attribute_table',
+                $attribute->getId(),
+                $productMetadata->getLinkField(),
+                $storeId
+            );
+
+            $select->joinLeft(
+                ['attribute_table' => $attribute->getBackendTable()],
+                $joinCondition,
+                ['filled' => new \Zend_Db_Expr(sprintf('%s.value IS NOT NULL', 'attribute_table'))]
+            );
+
+            $sql = $select->insertFromSelect($this->getTemporaryTableName($storeId));
+            $this->connection->query($sql);
         }
     }
 
@@ -145,7 +227,7 @@ SQL;
             : sprintf('WHERE cpe.entity_id IN (%s)', implode(',', $changedIds));
 
         $rawQuery = strtr($rawQuery, [
-            '%temporary_table_name%' => $this->tableBuilder->getTemporaryTableName($storeId),
+            '%temporary_table_name%' => $this->getTemporaryTableName($storeId),
             '%store_id%' => $storeId,
             '%entity_id_limitation%' => $entityIdLimitation
         ]);
