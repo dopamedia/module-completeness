@@ -58,7 +58,7 @@ abstract class AbstractAction
     /**
      * @return AbstractAction
      */
-    abstract public function execute(): AbstractAction;
+    abstract public function execute();
 
     /**
      * @param int $storeId

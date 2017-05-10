@@ -14,14 +14,14 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
     const INDEXER_ID = 'catalog_product_completeness';
 
     /**
-     * @var Product\Action\FullFactory
+     * @var Product\Action\Full
      */
-    protected $fullActionFactory;
+    protected $fullAction;
 
     /**
-     * @var Product\Action\RowsFactory
+     * @var Product\Action\Rows
      */
-    protected $rowsActionFactory;
+    protected $rowsAction;
 
     /**
      * @var \Magento\Framework\Indexer\IndexerRegistry
@@ -30,18 +30,18 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
 
     /**
      * Product constructor.
-     * @param Product\Action\FullFactory $fullActionFactory
-     * @param Product\Action\RowsFactory $rowsActionFactory
+     * @param Product\Action\Full $fullAction
+     * @param Product\Action\Rows $rowsAction
      * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
      */
     public function __construct(
-        \Dopamedia\Completeness\Model\Indexer\Completeness\Product\Action\FullFactory $fullActionFactory,
-        \Dopamedia\Completeness\Model\Indexer\Completeness\Product\Action\RowsFactory $rowsActionFactory,
+        \Dopamedia\Completeness\Model\Indexer\Completeness\Product\Action\Full $fullAction,
+        \Dopamedia\Completeness\Model\Indexer\Completeness\Product\Action\Rows $rowsAction,
         \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
     ) {
-        $this->fullActionFactory = $fullActionFactory;
+        $this->fullAction = $fullAction;
+        $this->rowsAction = $rowsAction;
         $this->indexerRegistry = $indexerRegistry;
-        $this->rowsActionFactory = $rowsActionFactory;
     }
 
     /**
@@ -49,7 +49,7 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
      */
     public function executeFull()
     {
-        $this->fullActionFactory->create()->execute();
+        $this->fullAction->execute();
     }
 
     /**
@@ -57,8 +57,7 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
      */
     public function executeList(array $ids)
     {
-        $this->executeAction($ids);
-
+        $this->rowsAction->execute($ids);
     }
 
     /**
@@ -66,7 +65,7 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
      */
     public function executeRow($id)
     {
-        $this->executeAction([$id]);
+        $this->rowsAction->execute([$id]);
     }
 
     /**
@@ -74,26 +73,6 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
      */
     public function execute($ids)
     {
-        $this->executeAction($ids);
+        $this->rowsAction->execute($ids);
     }
-
-    /**
-     * @param int[] $ids
-     * @return Product
-     */
-    protected function executeAction(array $ids): Product
-    {
-        $ids = array_unique($ids);
-        $indexer = $this->indexerRegistry->get(static::INDEXER_ID);
-
-        /** @var Product\Action\Rows $action */
-        $action = $this->rowsActionFactory->create();
-        if ($indexer->isWorking()) {
-            $action->execute($ids, true);
-        }
-        $action->execute($ids);
-
-        return $this;
-    }
-
 }

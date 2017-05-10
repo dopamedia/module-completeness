@@ -15,7 +15,7 @@ class Full extends AbstractAction
      * @return AbstractAction
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function execute(array $ids = null): AbstractAction
+    public function execute(array $ids = null)
     {
         try {
             foreach ($this->storeManager->getStores(true) as $store) {

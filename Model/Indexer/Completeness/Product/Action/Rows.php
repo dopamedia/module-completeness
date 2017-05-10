@@ -13,7 +13,7 @@ class Rows extends AbstractAction
     /**
      * @inheritDoc
      */
-    public function execute(array $entityIds = []): AbstractAction
+    public function execute(array $entityIds = [])
     {
         try {
             foreach ($this->storeManager->getStores(true) as $store) {
