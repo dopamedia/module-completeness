@@ -128,42 +128,51 @@ abstract class AbstractAction
      */
     private function fillTemporaryTable(int $storeId, array $attributes, array $changedIds = null)
     {
-        $select = $this->connection->select();
+        $selects = [];
         $productMetadata = $this->metadataPool->getMetadata(\Magento\Catalog\Api\Data\ProductInterface::class);
 
-        // TODO::find better way to save data to tmp table (maybe this could be done with a single query)
+        // TODO::find better way to avoid SQLSTATE[42000] if there are not attributes
+        if (empty($attributes)) {
+            return;
+        }
+
         foreach ($attributes as $attribute) {
-            $select->reset()->from(
+
+            $unionSelect = $this->connection->select()->from(
                 ['e' => $this->resource->getTableName('catalog_product_entity')],
                 [$productMetadata->getLinkField()]
             );
 
             if ($changedIds !== null) {
-                $select->where(
+                $unionSelect->where(
                     sprintf('e.%s IN (?)', $productMetadata->getLinkField()),
                     $changedIds
                 );
             }
 
-            $select->columns(['attribute_id' => new \Zend_Db_Expr($attribute->getId())]);
+            $unionSelect->columns(['attribute_id' => new \Zend_Db_Expr($attribute->getId())]);
 
             $joinCondition = sprintf(
                 'e.%3$s = %1$s.%3$s AND %1$s.attribute_id = %2$d AND %1$s.store_id = %4$d',
-                'attribute_table',
+                'value_table',
                 $attribute->getId(),
                 $productMetadata->getLinkField(),
                 $storeId
             );
 
-            $select->joinLeft(
-                ['attribute_table' => $attribute->getBackendTable()],
+            $unionSelect->joinLeft(
+                ['value_table' => $attribute->getBackendTable()],
                 $joinCondition,
-                ['filled' => new \Zend_Db_Expr(sprintf('%s.value IS NOT NULL', 'attribute_table'))]
+                ['filled' => new \Zend_Db_Expr(sprintf('%s.value IS NOT NULL', 'value_table'))]
             );
 
-            $sql = $select->insertFromSelect($this->getTemporaryTableName($storeId));
-            $this->connection->query($sql);
+            $selects[] = $unionSelect;
         }
+
+        /** @var \Magento\Framework\Db\Select $select */
+        $select = $this->connection->select()->union($selects, \Magento\Framework\DB\Select::SQL_UNION_ALL);
+        $sql = $select->insertFromSelect($this->getTemporaryTableName($storeId));
+        $this->connection->query($sql);
     }
 
     /**

@@ -11,7 +11,6 @@ use Dopamedia\Completeness\Model\Indexer\Completeness\Product\AbstractAction;
 class Rows extends AbstractAction
 {
     /**
-     * @TODO::currently a full reindex gets performed on every save operation => implement logic to process only some entities
      * @inheritDoc
      */
     public function execute(array $entityIds = []): AbstractAction
