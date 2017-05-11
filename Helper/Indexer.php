@@ -54,14 +54,6 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @return string
-     */
-    public function getEntityType(): string
-    {
-        return \Magento\Catalog\Model\Product::ENTITY;
-    }
-
-    /**
      * @param int $storeId
      * @return array
      */
@@ -71,11 +63,11 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
             $this->attributesBuffer = [];
             $attributeCodes = $this->getAttributeCodes($storeId);
             /** @var \Magento\Eav\Model\Entity\AbstractEntity $entity */
-            $entity = $this->eavConfig->getEntityType($this->getEntityType())->getEntity();
+            $entity = $this->eavConfig->getEntityType(\Magento\Catalog\Model\Product::ENTITY)->getEntity();
 
             foreach ($attributeCodes as $attributeCode) {
                 $attribute = $this->eavConfig->getAttribute(
-                    $this->getEntityType(),
+                    \Magento\Catalog\Model\Product::ENTITY,
                     $attributeCode
                 )->setEntity(
                     $entity

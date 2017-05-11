@@ -171,6 +171,11 @@ abstract class AbstractAction
 
         /** @var \Magento\Framework\Db\Select $select */
         $select = $this->connection->select()->union($selects, \Magento\Framework\DB\Select::SQL_UNION_ALL);
+
+
+        echo $select->__toString();
+        die();
+
         $sql = $select->insertFromSelect($this->getTemporaryTableName($storeId));
         $this->connection->query($sql);
     }

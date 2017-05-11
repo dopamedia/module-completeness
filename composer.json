@@ -12,7 +12,8 @@
     }
   ],
   "require": {
-    "magento/framework": "100.1.6"
+    "magento/framework": "100.1.6",
+    "magento/zendframework1": "~1.12.16"
   },
   "require-dev": {
     "phpunit/phpunit": "4.1.0"
