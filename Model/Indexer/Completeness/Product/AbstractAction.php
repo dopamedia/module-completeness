@@ -172,82 +172,90 @@ abstract class AbstractAction
         /** @var \Magento\Framework\Db\Select $select */
         $select = $this->connection->select()->union($selects, \Magento\Framework\DB\Select::SQL_UNION_ALL);
 
-
-        echo $select->__toString();
-        die();
-
         $sql = $select->insertFromSelect($this->getTemporaryTableName($storeId));
         $this->connection->query($sql);
     }
 
     /**
-     * TODO::replace raw query with DDL
-     *
      * @param int $storeId
      * @param array|null $changedIds
      */
     private function updateCompleteness(int $storeId, array $changedIds = null)
     {
-        $rawQuery = <<<SQL
-INSERT INTO catalog_product_completeness
-  SELECT
-    entity_id,
-    %store_id%                                 AS store_id,
-    (required_count - req_values_filled)       AS missing_count,
-    required_count,
-    (req_values_filled / required_count * 100) AS ratio
-  FROM (
-         SELECT
-           values_filled.entity_id,
-           values_filled.req_values_filled,
-           (
-             SELECT COUNT(*)
-             FROM catalog_product_completeness_requirement AS cpcr
-             WHERE cpcr.type_id = values_filled.type_id
-                   AND cpcr.attribute_set_id = values_filled.attribute_set_id
-                   AND cpcr.store_id = %store_id%
-           ) AS required_count
-         FROM (
-                SELECT
-                  cpe.entity_id,
-                  cpe.type_id,
-                  cpe.attribute_set_id,
-                  (
-                    SELECT SUM(filled) AS filled
-                    FROM %temporary_table_name% AS cpcti
-                    WHERE cpcti.entity_id = cpe.entity_id
-                          AND cpcti.attribute_id IN (
-                      SELECT attribute_id
-                      FROM catalog_product_completeness_requirement AS cpcr
-                      WHERE cpcr.type_id = cpe.type_id
-                            AND cpcr.attribute_set_id = cpe.attribute_set_id
-                            AND cpcr.store_id = %store_id%
-                    )
-                    GROUP BY cpe.entity_id
-                  ) AS req_values_filled
-                FROM catalog_product_entity AS cpe
-                %entity_id_limitation%
-                GROUP BY cpe.entity_id
-              ) AS values_filled
-       ) AS result
-ON DUPLICATE KEY UPDATE
-  missing_count  = VALUES(missing_count),
-  required_count = VALUES(required_count),
-  ratio          = VALUES(ratio);
-SQL;
+        $connection = $this->connection;
 
-        $entityIdLimitation = ($changedIds === null)
-            ? ''
-            : sprintf('WHERE cpe.entity_id IN (%s)', implode(',', $changedIds));
+        $requiredAttributeIdsSelect = $connection->select()
+            ->from(
+                ['cpcr' => $connection->getTableName('catalog_product_completeness_requirement')],
+                ['attribute_id']
+            )
+            ->where('cpcr.type_id = cpe.type_id')
+            ->where('cpcr.attribute_set_id = cpe.attribute_set_id')
+            ->where('cpcr.store_id = (?)', $storeId);
 
-        $rawQuery = strtr($rawQuery, [
-            '%temporary_table_name%' => $this->getTemporaryTableName($storeId),
-            '%store_id%' => $storeId,
-            '%entity_id_limitation%' => $entityIdLimitation
-        ]);
+        $requiredValuesFilledSelect = $connection->select()
+            ->from(
+                ['cpcti' => $this->getTemporaryTableName($storeId)],
+                ['filled' => 'SUM(filled)']
+            )
+            ->where('cpcti.entity_id = cpe.entity_id')
+            ->where('cpcti.attribute_id IN ?', $requiredAttributeIdsSelect)
+            ->group('cpe.entity_id');
+
+        $valuesFilledSelect = $connection->select()
+            ->from(
+                ['cpe' => $connection->getTableName('catalog_product_entity')],
+                [
+                    'cpe.entity_id',
+                    'cpe.type_id',
+                    'cpe.attribute_set_id',
+                    'req_values_filled' => $requiredValuesFilledSelect
+                ]
+            )->group('cpe.entity_id');
 
 
-        $query = $this->connection->query($rawQuery);
-        $query->execute();
+        if ($changedIds !== null) {
+            $valuesFilledSelect->where('cpe.entity_id IN (?)', $changedIds);
+        }
+
+        $requiredCountSelect = $connection->select()
+            ->from(
+                ['cpcr' => $connection->getTableName('catalog_product_completeness_requirement')],
+                ['required_count' => new \Zend_Db_Expr('COUNT(*)')]
+            )
+            ->where('cpcr.type_id = values_filled.type_id')
+            ->where('cpcr.attribute_set_id = values_filled.attribute_set_id')
+            ->where('cpcr.store_id = ?', $storeId);
+
+        $resultSelect = $connection->select()
+            ->from(
+                ['values_filled' => $valuesFilledSelect],
+                [
+                    'values_filled.entity_id',
+                    'values_filled.req_values_filled',
+                    'required_count' => $requiredCountSelect
+                ]
+            );
+
+        $select = $connection->select()
+            ->from(
+                ['result' => $resultSelect],
+                [
+                    'entity_id',
+                    'store_id' => new \Zend_Db_Expr($storeId),
+                    'missing_count' => 'IFNULL((required_count - req_values_filled), 0)',
+                    'required_count',
+                    'ratio' => 'IFNULL((req_values_filled / required_count * 100), 0)'
+                ]
+            );
+
+        $insertQuery = $connection->insertFromSelect(
+            $select,
+            $this->connection->getTableName('catalog_product_completeness'),
+            [],
+            \Magento\Framework\DB\Adapter\Pdo\Mysql::INSERT_ON_DUPLICATE
+        );
+
+        $connection->query($insertQuery);
     }
 }
