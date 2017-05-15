@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Dopamedia_Completeness::completeness" title="Completeness" translate="title" module="Dopamedia_Completeness" sortOrder="45" parent="Magento_Backend::stores" resource="Dopamedia_Completeness::completeness" />
+        <add id="Dopamedia_Completeness::completeness_requirement" title="Requirement" translate="title" module="Dopamedia_Completeness" sortOrder="10" parent="Dopamedia_Completeness::completeness" action="completeness/requirement" resource="Dopamedia_Completeness::completeness_requirement" />
+    </menu>
+</config>

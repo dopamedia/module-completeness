@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">completeness_requirement_listing.completeness_requirement_listing_data_source</item>
+            <item name="deps" xsi:type="string">completeness_requirement_listing.completeness_requirement_listing_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">completeness_requirement_columns</item>
+    </argument>
+    <dataSource name="completeness_requirement_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider</argument>
+            <argument name="name" xsi:type="string">completeness_requirement_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">attribute_set_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    <columns name="completeness_requirement_columns">
+        <column name="attribute_set_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">textRange</item>
+                    <item name="sorting" xsi:type="string">asc</item>
+                    <item name="label" xsi:type="string" translate="true">ID</item>
+                </item>
+            </argument>
+        </column>
+        <column name="attribute_set_name">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">Attribute Set</item>
+                </item>
+            </argument>
+        </column>
+        <actionsColumn name="actions" class="Dopamedia\Completeness\Ui\Component\Listing\Columns\EditAction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">attribute_set_id</item>
+                    <item name="editUrlPath" xsi:type="string">completeness/requirement/edit</item>
+                </item>
+            </argument>
+        </actionsColumn>
+    </columns>
+</listing>
