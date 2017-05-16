@@ -55,7 +55,9 @@ class EditAction extends Column
                             'href' => $this->urlBuilder->getUrl(
                                 $editUrlPath,
                                 [
-                                    'attribute_set_id' => $item['attribute_set_id']
+                                    'attribute_set_id' => $item['attribute_set_id'],
+                                    'product_type_id' => $item['product_type_id'],
+                                    'store_id' => $item['store_id']
                                 ]
                             ),
                             'label' => __('Edit')
