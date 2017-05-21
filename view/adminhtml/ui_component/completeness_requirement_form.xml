@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd"  >
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">completeness_requirement_form.requirement_form_data_source</item>
+            <item name="deps" xsi:type="string">completeness_requirement_form.requirement_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">General Information</item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="namespace" xsi:type="string">completeness_requirement_form</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+        <item name="buttons" xsi:type="array">
+            <item name="back" xsi:type="string">Dopamedia\Completeness\Block\Adminhtml\Completeness\Edit\BackButton</item>
+            <item name="save" xsi:type="string">Dopamedia\Completeness\Block\Adminhtml\Completeness\Edit\SaveButton</item>
+            <item name="save_and_continue" xsi:type="string">Dopamedia\Completeness\Block\Adminhtml\Completeness\Edit\SaveAndContinueButton</item>
+        </item>
+    </argument>
+    <dataSource name="requirement_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Dopamedia\Completeness\Ui\DataProvider\Completeness\RequirementDataProvider</argument>
+            <argument name="name" xsi:type="string">requirement_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">requirement_id</argument>
+            <argument name="requestFieldName" xsi:type="string">requirement_id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" xsi:type="url" path="completeness/requirement/save"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+    <fieldset name="general">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string"/>
+            </item>
+        </argument>
+        <field name="attribute_set_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="source" xsi:type="string">requirement</item>
+                    <item name="dataScope" xsi:type="string">attribute_set_id</item>
+                </item>
+            </argument>
+        </field>
+        <field name="product_type_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="source" xsi:type="string">requirement</item>
+                    <item name="dataScope" xsi:type="string">product_type_id</item>
+                </item>
+            </argument>
+        </field>
+        <field name="store_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="source" xsi:type="string">requirement</item>
+                    <item name="dataScope" xsi:type="string">store_id</item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+</form>
