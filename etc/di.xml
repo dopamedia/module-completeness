@@ -6,12 +6,11 @@
     <type name="Magento\Catalog\Model\Product\Action">
         <plugin name="completeness" type="Dopamedia\Completeness\Plugin\Product\Action" />
     </type>
-    <!--
-    <type name="Magento\Store\Model\ResourceModel\Store">
-        <plugin name="catalogsearchFulltextIndexerStoreView" type="Magento\CatalogSearch\Model\Indexer\Fulltext\Plugin\Store\View" />
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="completeness_requirement_listing_data_source" xsi:type="string">Dopamedia\Completeness\Model\ResourceModel\Requirement\Grid\Collection</item>
+            </argument>
+        </arguments>
     </type>
-    <type name="Magento\Catalog\Model\ResourceModel\Attribute">
-        <plugin name="catalogsearchFulltextIndexerAttribute" type="Magento\CatalogSearch\Model\Indexer\Fulltext\Plugin\Attribute"/>
-    </type>
-    -->
 </config>
