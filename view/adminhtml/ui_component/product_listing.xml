@@ -4,8 +4,10 @@
         <column name="completeness" class="Dopamedia\Completeness\Ui\Component\Listing\Columns\Completeness">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="add_field" xsi:type="boolean">true</item>
+                    <item name="component" xsi:type="string">Dopamedia_Completeness/js/grid/columns/completeness</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
                     <item name="dataType" xsi:type="string">text</item>
+                    <item name="add_field" xsi:type="boolean">true</item>
                     <item name="label" xsi:type="string" translate="true">Completeness</item>
                     <item name="sortOrder" xsi:type="number">75</item>
                 </item>

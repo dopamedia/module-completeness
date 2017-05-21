@@ -116,8 +116,8 @@ abstract class AbstractAction
                 ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_PRIMARY]
             );
 
-        $this->connection->dropTemporaryTable($temporaryName);
-        $this->connection->createTemporaryTable($temporaryTable);
+        $this->connection->dropTable($temporaryName);
+        $this->connection->createTable($temporaryTable);
     }
 
     /**
