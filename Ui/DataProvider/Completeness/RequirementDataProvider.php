@@ -22,6 +22,16 @@ class RequirementDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvi
     private $request;
 
     /**
+     * @var \Magento\Framework\App\ResourceConnection
+     */
+    private $resource;
+
+    /**
+     * @var \Magento\Framework\DB\Adapter\AdapterInterface
+     */
+    private $connection;
+
+    /**
      * @var \Magento\Eav\Api\AttributeSetRepositoryInterface
      */
     private $attributeSetRepository;
@@ -43,6 +53,7 @@ class RequirementDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvi
         $primaryFieldName,
         $requestFieldName,
         \Magento\Framework\App\RequestInterface $request,
+        \Magento\Framework\App\ResourceConnection $resource,
         \Magento\Eav\Api\AttributeSetRepositoryInterface $attributeSetRepository,
         \Magento\Eav\Model\Entity\Attribute\GroupFactory $attributeGroupFactory,
         \Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory $attributeCollectionFactory,
@@ -50,6 +61,8 @@ class RequirementDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvi
         array $data = []
     ) {
         $this->request = $request;
+        $this->resource = $resource;
+        $this->connection = $resource->getConnection();
         $this->attributeSetRepository = $attributeSetRepository;
         $this->attributeGroupFactory = $attributeGroupFactory;
         $this->attributeCollectionFactory = $attributeCollectionFactory;
@@ -80,10 +93,24 @@ class RequirementDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvi
         $config = parent::getConfigData();
 
         $config['data'] = [
-            'attribute_set_id' => $this->request->getParam('attribute_set_id'),
-            'product_type_id' => $this->request->getParam('product_type_id'),
-            'store_id' => $this->request->getParam('store_id')
+            'attribute_set_id' => $this->getAttributeSetId(),
+            'product_type_id' => $this->getProductTypeId(),
+            'store_id' => $this->getStoreId()
         ];
+
+        $select = $this->connection->select()
+            ->from(
+                $this->resource->getTableName('catalog_product_completeness_requirement'),
+                ['attribute_id']
+            )
+            ->where('attribute_set_id = ?', $this->getAttributeSetId())
+            ->where('store_id = ?', $this->getStoreId())
+            ->where('type_id = ?', $this->getProductTypeId());
+
+
+        foreach ($this->connection->fetchCol($select) as $attributeId) {
+            $config['data'][sprintf('attribute[%s]', $attributeId)] = 1;
+        }
 
         return $config;
     }
@@ -187,7 +214,7 @@ class RequirementDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvi
                     continue;
                 }
 
-                $fieldset['children'][$attribute->getAttributeCode()] = [
+                $fieldset['children'][$attribute->getAttributeId()] = [
                     'arguments' => [
                         'data' => [
                             'config' => [
@@ -196,7 +223,7 @@ class RequirementDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvi
                                 'componentType' => 'checkbox',
                                 'prefer' => 'toggle',
                                 'source' => 'requirement',
-                                'dataScope' => $attribute->getAttributeCode(),
+                                'dataScope' => sprintf('attribute[%s]', $attribute->getAttributeId()),
                                 'valueMap' => [
                                     'true' => 1,
                                     'false' => 0
