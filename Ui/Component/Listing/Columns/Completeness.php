@@ -15,6 +15,7 @@ class Completeness extends \Magento\Ui\Component\Listing\Columns\Column
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
+
     /**
      * Completeness constructor.
      * @param ContextInterface $context
@@ -44,15 +45,10 @@ class Completeness extends \Magento\Ui\Component\Listing\Columns\Column
      */
     public function prepareDataSource(array $dataSource)
     {
-        $storeFilter = $this->context->getFilterParam('store_id');
         $fieldName = $this->getData('name');
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if ($storeFilter) {
-                    $item[$fieldName] = $this->decorateStatus($item['completeness_scope']);
-                } else {
-                    $item[$fieldName] = $this->decorateStatus($item['completeness_default']);
-                }
+                $item[$fieldName] = $item['completeness'];
             }
         }
 
@@ -60,15 +56,4 @@ class Completeness extends \Magento\Ui\Component\Listing\Columns\Column
 
     }
 
-
-    private function decorateStatus($value)
-    {
-        if ($value == 0) {
-            return "<span class=\"grid-severity-critical\"><span>" . $value . " %</span></span>";
-        } elseif ($value < 100) {
-            return "<span class=\"grid-severity-minor\"><span>" . $value . " %</span></span>";
-        } else {
-            return "<span class=\"grid-severity-notice\"><span>" . $value . " %</span></span>";
-        }
-    }
 }

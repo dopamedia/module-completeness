@@ -15,7 +15,14 @@ define([
          * @returns {String} label.
          */
         getLabel: function (value) {
-            return value.completeness;
+            var _value = value.completeness;
+            if (_value == 0) {
+                return "<span class=\"grid-severity-critical\"><span>" + _value + " %</span></span>";
+            } else if (value < 100) {
+                return "<span class=\"grid-severity-minor\"><span>" + _value + " %</span></span>";
+            } else {
+                return "<span class=\"grid-severity-notice\"><span>" + _value + " %</span></span>";
+            }
         }
     });
 });
