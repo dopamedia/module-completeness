@@ -52,24 +52,17 @@ class AddCompletenessFieldToCollection implements AddFieldToCollectionInterface
         $storeFilter = $this->context->getFilterParam('store_id');
         if ($storeFilter) {
             $storeId = $collection->getStoreId();
-            $collection->joinField(
-                'completeness_scope',
-                'catalog_product_completeness',
-                'ratio',
-                'entity_id=entity_id',
-                '{{table}}.store_id=' . $storeId,
-                'left'
-            );
         } else {
-            $collection->joinField(
-                'completeness_default',
-                'catalog_product_completeness',
-                'ratio',
-                'entity_id=entity_id',
-                '{{table}}.store_id=' . \Magento\Store\Model\Store::DEFAULT_STORE_ID,
-                'left'
-            );
+            $storeId = \Magento\Store\Model\Store::DEFAULT_STORE_ID;
         }
+        $collection->joinField(
+            'completeness',
+            'catalog_product_completeness',
+            'ratio',
+            'entity_id=entity_id',
+            '{{table}}.store_id=' . $storeId,
+            'left'
+        );
 
     }
 }
