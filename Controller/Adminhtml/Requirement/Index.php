@@ -14,7 +14,6 @@ use Dopamedia\Completeness\Controller\Adminhtml\Requirement;
  */
 class Index extends Requirement
 {
-
     /**
      * @inheritdoc
      */

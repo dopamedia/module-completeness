@@ -1,14 +1,18 @@
 <?php
 /**
  * User: Andreas Penz <office@dopa.media>
- * Date: 20.05.17
+ * Date: 26.05.17
  */
 
-namespace Dopamedia\Completeness\Block\Adminhtml\Completeness\Edit;
+namespace Dopamedia\Completeness\Block\Adminhtml\Requirement\Button;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
-class SaveButton extends GenericButton implements ButtonProviderInterface
+/**
+ * Class Add
+ * @package Dopamedia\Completeness\Block\Adminhtml\Requirement\Button
+ */
+class Add implements ButtonProviderInterface
 {
     /**
      * @return array
@@ -16,13 +20,12 @@ class SaveButton extends GenericButton implements ButtonProviderInterface
     public function getButtonData()
     {
         return [
-            'label' => __('Save'),
+            'label' => __('Add Requirement'),
             'class' => 'save primary',
             'data_attribute' => [
                 'mage-init' => ['button' => ['event' => 'save']],
                 'form-role' => 'save',
-            ],
-            'sort_order' => 90,
+            ]
         ];
     }
 }

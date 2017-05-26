@@ -4,7 +4,7 @@
  * Date: 16.05.17
  */
 
-namespace Dopamedia\Completeness\Ui\Component\Listing\Columns;
+namespace Dopamedia\Completeness\Ui\Component\Listing\Columns\Requirement;
 
 use Magento\Framework\Data\OptionSourceInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
