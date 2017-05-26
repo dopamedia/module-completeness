@@ -106,7 +106,7 @@ class InstallSchema implements InstallSchemaInterface
         $table = $installer->getConnection()
             ->newTable($installer->getTable('catalog_product_completeness_requirement'))
             ->addColumn(
-                'id',
+                'requirement_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
                 null,
                 ['identity' => true, 'nullable' => false, 'primary' => true],

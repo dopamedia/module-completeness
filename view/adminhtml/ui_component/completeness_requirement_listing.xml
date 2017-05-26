@@ -6,22 +6,56 @@
             <item name="deps" xsi:type="string">completeness_requirement_listing.completeness_requirement_listing_data_source</item>
         </item>
         <item name="spinner" xsi:type="string">completeness_requirement_columns</item>
+        <item name="buttons" xsi:type="array">
+            <item name="add" xsi:type="array">
+                <item name="label" xsi:type="string" translate="true">Add Requirement</item>
+                <item name="class" xsi:type="string">primary</item>
+                <item name="on_click" xsi:type="string" />
+                <item name="data_attribute" xsi:type="array">
+                    <item name="mage-init" xsi:type="array">
+                        <item name="Magento_Ui/js/form/button-adapter" xsi:type="array">
+                            <item name="actions" xsi:type="array">
+                                <item name="0" xsi:type="array">
+                                    <item name="targetName" xsi:type="string">completeness_requirement_listing.completeness_requirement_listing.modalContainer.add_requirement_modal</item>
+                                    <item name="actionName" xsi:type="string">toggleModal</item>
+                                </item>
+                                <item name="1" xsi:type="array">
+                                    <item name="targetName" xsi:type="string">completeness_requirement_listing.completeness_requirement_listing.modalContainer.add_requirement_modal.add_requirement_form</item>
+                                    <item name="actionName" xsi:type="string">render</item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </item>
+        </item>
     </argument>
     <dataSource name="completeness_requirement_listing_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider</argument>
+            <argument name="class" xsi:type="string">Dopamedia\Completeness\Ui\DataProvider\Requirement\Listing\DataProvider</argument>
             <argument name="name" xsi:type="string">completeness_requirement_listing_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">attribute_set_id</argument>
+            <argument name="primaryFieldName" xsi:type="string">requirement_id</argument>
             <argument name="requestFieldName" xsi:type="string">id</argument>
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">requirement_id</item>
+                    </item>
                 </item>
             </argument>
         </argument>
     </dataSource>
     <listingToolbar name="listing_top">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="sticky" xsi:type="boolean">true</item>
+            </item>
+        </argument>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
         <filters name="listing_filters">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -34,14 +68,44 @@
                         </item>
                     </item>
                 </item>
-                <item name="observers" xsi:type="array">
-                    <item name="column" xsi:type="string">column</item>
-                </item>
             </argument>
         </filters>
+        <massaction name="listing_massaction">
+            <action name="delete">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">delete</item>
+                        <item name="label" xsi:type="string" translate="true">Delete</item>
+                        <item name="url" xsi:type="url" path="completeness/requirement/massDelete"/>
+                        <item name="confirm" xsi:type="array">
+                            <item name="title" xsi:type="string" translate="true">Delete items</item>
+                            <item name="message" xsi:type="string" translate="true">Are you sure you wan't to delete selected items?</item>
+                        </item>
+                    </item>
+                </argument>
+            </action>
+        </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="completeness_requirement_columns">
+        <selectionsColumn name="ids">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">requirement_id</item>
+                </item>
+            </argument>
+        </selectionsColumn>
+        <column name="attribute_id">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Dopamedia\Completeness\Ui\Component\Listing\Columns\Requirement\Attribute</item>
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" xsi:type="string" translate="true">Attribute</item>
+                </item>
+            </argument>
+        </column>
         <column name="attribute_set_id">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">Magento\Catalog\Model\Product\AttributeSet\Options</item>
@@ -50,11 +114,10 @@
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="label" xsi:type="string" translate="true">Attribute Set</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
                 </item>
             </argument>
         </column>
-        <column name="product_type_id">
+        <column name="type_id">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">Magento\Catalog\Model\Product\Type</item>
                 <item name="config" xsi:type="array">
@@ -62,29 +125,30 @@
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="label" xsi:type="string" translate="true">Product Type</item>
-                    <item name="sortOrder" xsi:type="number">20</item>
                 </item>
             </argument>
         </column>
         <column name="store_id">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">Dopamedia\Completeness\Ui\Component\Listing\Columns\Store</item>
+                <item name="options" xsi:type="object">Dopamedia\Completeness\Ui\Component\Listing\Columns\Requirement\Store</item>
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">select</item>
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="label" xsi:type="string" translate="true">Store</item>
-                    <item name="sortOrder" xsi:type="number">30</item>
                 </item>
             </argument>
         </column>
-        <actionsColumn name="actions" class="Dopamedia\Completeness\Ui\Component\Listing\Columns\EditAction">
+        <actionsColumn name="actions" class="Dopamedia\Completeness\Ui\Component\Listing\Columns\Requirement\Delete">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="indexField" xsi:type="string">attribute_set_id</item>
-                    <item name="editUrlPath" xsi:type="string">completeness/requirement/edit</item>
+                    <item name="indexField" xsi:type="string">requirement_id</item>
+                    <item name="deleteUrlPath" xsi:type="string">completeness/requirement/delete</item>
                 </item>
             </argument>
         </actionsColumn>
     </columns>
+    <container name="modalContainer">
+        <modal name="add_requirement_modal" />
+    </container>
 </listing>

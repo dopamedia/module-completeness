@@ -4,7 +4,7 @@
  * Date: 23.04.17
  */
 
-namespace Dopamedia\Completeness\Ui\Component\Listing\Columns;
+namespace Dopamedia\Completeness\Ui\Component\Listing\Columns\Product;
 
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
