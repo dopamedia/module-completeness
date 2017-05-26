@@ -21,7 +21,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="validate_url" xsi:type="url" path="completeness/requirement/validate"/>
-                    <item name="submit_url" xsi:type="url" path="completeness/requirement/addPost"/>
+                    <item name="submit_url" xsi:type="url" path="completeness/requirement/add"/>
                 </item>
             </argument>
         </argument>
